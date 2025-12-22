@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login MATCHA - Sistem Retail</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --matcha: #8fbc8f;
+            --matcha-dark: #6d966d;
+            --bg-soft: #f4f7f6;
+        }
+
+        body {
+            background-color: var(--bg-soft);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .login-container {
+            max-width: 420px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .card-login {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .card-header-matcha {
+            background-color: var(--matcha);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-matcha {
+            background-color: var(--matcha);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-matcha:hover {
+            background-color: var(--matcha-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(143, 188, 143, 0.4);
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(143, 188, 143, 0.2);
+            border-color: var(--matcha);
+            background-color: #fff;
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container d-flex justify-content-center">
+    <div class="login-container">
+        <div class="card card-login">
+            <div class="card-header-matcha">
+                <div class="logo-icon">
+                    <i class="bi bi-shop"></i>
+                </div>
+                <h4 class="fw-bold mb-0">MATCHA RETAIL</h4>
+                <p class="small opacity-75 mb-0">Silakan login untuk masuk ke sistem</p>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert alert-danger border-0 small shadow-sm mb-4 alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i> {{ messages[0] }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" name="username" class="form-control" placeholder="Username Anda" required autofocus>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid shadow-sm">
+                        <button type="submit" class="btn btn-matcha">
+                            Masuk Sekarang <i class="bi bi-arrow-right-short ms-1"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <p class="text-muted small">
+                &copy; 2025 <b>Matcha Project</b>. <br>
+                <span class="opacity-50">Sistem Inventory & Kasir Terintegrasi</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
