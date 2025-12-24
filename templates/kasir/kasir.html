@@ -3,174 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasir MATCHA - Penjualan Retail</title>
+    <title>Kasir MATCHA</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <style>
-        :root { 
-            --matcha: #8fbc8f; 
-            --matcha-dark: #6d966d; 
-            --matcha-light: #f0f5f0;
-        }
-
         body { 
             background-color: #f4f7f6; 
-            font-family: 'Inter', 'Segoe UI', sans-serif; 
+            font-family: sans-serif; 
         }
 
-        /* UI Components */
         .card-custom { 
-            border: none; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+            background: white;
+            border-radius: 8px; 
+            padding: 20px;
         }
 
         .header-title { 
-            border-left: 5px solid var(--matcha); 
+            border-left: 5px solid #8fbc8f; 
             padding-left: 15px; 
-            color: #444;
         }
 
-        /* Display Total Area */
         .display-total-box {
-            background: linear-gradient(135deg, var(--matcha), var(--matcha-dark));
+            background-color: #8fbc8f;
             color: white;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: right;
-            box-shadow: 0 8px 20px rgba(143, 188, 143, 0.3);
-        }
-        .total-label { font-size: 0.9rem; font-weight: 500; opacity: 0.9; text-transform: uppercase; }
-        .total-text { font-size: 3.5rem; font-weight: 800; line-height: 1; margin-top: 5px; }
-
-        /* Table Styling */
-        .table thead { background-color: var(--matcha-light); }
-        .table thead th { 
-            border: none; 
-            color: var(--matcha-dark); 
-            text-transform: uppercase; 
-            font-size: 0.75rem; 
-            letter-spacing: 1px; 
-            padding: 15px;
-        }
-        .table tbody td { padding: 15px; border-bottom: 1px solid #eee; }
-
-        /* Buttons */
-        .btn-matcha { 
-            background-color: var(--matcha); 
-            color: white; 
-            border: none; 
-            font-weight: 600; 
-            transition: all 0.2s;
-        }
-        .btn-matcha:hover { 
-            background-color: var(--matcha-dark); 
-            color: white; 
-            transform: translateY(-1px);
-        }
-        
-        .btn-pay {
-            font-size: 1.25rem;
-            padding: 15px;
+            padding: 20px;
             border-radius: 10px;
-            letter-spacing: 1px;
+            text-align: right;
         }
 
-        /* Custom Scrollbar for Basket */
-        .basket-container {
-            min-height: 450px;
-            max-height: 450px;
-            overflow-y: auto;
+        .total-text { 
+            font-size: 40px; 
+            font-weight: bold; 
+        }
+
+        .btn-matcha { 
+            background-color: #8fbc8f; 
+            color: white; 
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-matcha:hover { 
+            background-color: #6d966d; 
+        }
+
+        .basket-container { 
+            height: 400px; 
+            overflow-y: scroll; 
         }
     </style>
 </head>
 <body>
 
 <div class="container-fluid p-4">
-    <div class="row align-items-center mb-4">
-        <div class="col">
-            <h2 class="fw-bold header-title">Kasir Matcha</h2>
-            <div id="live-clock" class="text-muted"><i class="bi bi-clock me-1"></i> -- : -- : --</div>
-        </div>
+    <div class="row align-items-center mb-4 justify-content-between">
         <div class="col-auto">
+            <h1 class="fw-bold header-title mb-0">Kasir Matcha</h1>
+        </div>
+
+        <div class="col-auto text-end">
+            <div id="jam" class="fw-bold text-muted mb-2"></div>
             <div class="btn-group">
-                <a href="/" class="btn btn-outline-danger px-4 rounded-start-pill">
-                    <i class="bi bi-box-arrow-left me-1"></i> Keluar
-                </a>
-                <button class="btn btn-outline-secondary px-4 rounded-end-pill" data-bs-toggle="modal" data-bs-target="#modalRiwayat">
-                    <i class="bi bi-receipt me-1"></i> Riwayat
-                </button>
+                <a href="/logout" class="btn btn-outline-danger px-4 rounded-start-pill">Keluar</a>
+                <button class="btn btn-outline-secondary px-4 rounded-end-pill" data-bs-toggle="modal" data-bs-target="#modalRiwayat">Riwayat</button>
             </div>
         </div>
     </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
     <div class="row g-4">
         <div class="col-lg-8">
             <div class="card card-custom p-3 mb-4">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-8">
-                        <label class="form-label small fw-bold text-muted">Pilih Produk</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                            <select id="select-barang" class="form-select border-start-0 ps-0 shadow-none">
-                                <option value="" disabled selected>Cari nama barang atau scan barcode...</option>
+                <form action="/kasir/tambah" method="POST">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted">Pilih Produk</label>
+                            <select name="id_barang" class="form-select shadow-none" required>
+                                <option value="" disabled selected>Pilih barang...</option>
                                 {% for b in barang %}
-                                <option value="{{ b[0] }}" data-barcode="{{ b[1] }}" data-nama="{{ b[2] }}" data-harga="{{ b[3] }}" data-stok="{{ b[4] }}">
+                                <option value="{{ b[0] }}">
                                     [{{ b[1] }}] {{ b[2] }} — Rp{{ "{:,.0f}".format(b[3]) }} (Stok: {{ b[4] }})
                                 </option>
                                 {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold text-muted">Jumlah</label>
+                            <input type="number" name="qty" class="form-control text-center shadow-none" value="1" min="1">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-matcha w-100 py-2">
+                                <i class="bi bi-plus-lg"></i> Tambah
+                            </button>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label small fw-bold text-muted">Jumlah</label>
-                        <input type="number" id="input-qty" class="form-control text-center shadow-none" value="1" min="1">
-                    </div>
-                    <div class="col-md-2">
-                        <button onclick="tambahItem()" class="btn btn-matcha w-100 py-2">
-                            <i class="bi bi-plus-lg"></i>
-                        </button>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <div class="card card-custom overflow-hidden">
                 <div class="basket-container">
-                    <table class="table table-hover align-middle mb-0" id="tabel-keranjang">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
                             <tr class="text-center">
                                 <th width="60">#</th>
                                 <th class="text-start">Informasi Produk</th>
-                                <th>Harga Satuan</th>
-                                <th width="120">Qty</th>
-                                <th class="text-end">Subtotal</th>
+                                <th>Harga</th>
+                                <th>Qty</th>
+                                <th class="text-end pe-4">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
-                            </tbody>
+                            {% for item in keranjang %}
+                            <tr>
+                                <td class="text-center">
+                                    <a href="/kasir/hapus/{{ loop.index0 }}" class="btn btn-sm text-danger border-0">
+                                        <i class="bi bi-x-circle-fill"></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">{{ item.nama }}</div>
+                                    <small class="text-muted">{{ item.barcode }}</small>
+                                </td>
+                                <td class="text-center">Rp{{ "{:,.0f}".format(item.harga) }}</td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border">{{ item.qty }}</span>
+                                </td>
+                                <td class="text-end pe-4 fw-bold">Rp{{ "{:,.0f}".format(item.subtotal) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
-                </div>
-                <div id="empty-state" class="text-center py-5">
-                    <i class="bi bi-cart3 display-1 text-light"></i>
-                    <p class="text-muted mt-2">Belum ada produk di keranjang</p>
+                    {% if not keranjang %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-cart3 display-1 text-light"></i>
+                        <p class="text-muted">Keranjang masih kosong</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
         <div class="col-lg-4">
             <div class="display-total-box mb-4">
-                <div class="total-label">Total Pembayaran</div>
-                <div class="total-text"><small style="font-size: 1.5rem;">Rp</small> <span id="grand-total">0</span></div>
+                <div class="small opacity-75 uppercase">Total Pembayaran</div>
+                <div class="total-text"><small style="font-size: 1.5rem;">Rp</small> {{ "{:,.0f}".format(grand_total) }}</div>
             </div>
 
-            <div class="card card-custom p-4 shadow-sm border-top border-success border-4">
-                <button onclick="prosesBayar()" class="btn btn-success w-100 btn-pay fw-bold shadow">
-                    <i class="bi bi-check-all me-2"></i> SELESAIKAN
-                </button>
+            <div class="card card-custom p-4 shadow-sm border-top border-success border-0">
+                <form action="/kasir/bayar" method="POST">
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold shadow" {% if not keranjang %}disabled{% endif %}>
+                        <i class="bi bi-check-all me-2"></i> SELESAIKAN TRANSAKSI
+                    </button>
+                </form>
                 <div class="text-center mt-3">
-                    <small class="text-muted">Tekan <b>F2</b> untuk cari, <b>F9</b> untuk bayar</small>
+                    <p class="text-muted">Selesaikan transaksi disini</p>
                 </div>
             </div>
         </div>
@@ -179,9 +178,9 @@
 
 <div class="modal fade" id="modalRiwayat" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow" style="border-radius:15px;">
+        <div class="modal-content border-0 shadow">
             <div class="modal-header bg-light border-0">
-                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-clock-history me-2 text-matcha"></i>10 Transaksi Terakhir</h5>
+                <h5 class="modal-title fw-bold">10 Transaksi Terakhir</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-0">
@@ -190,7 +189,7 @@
                         <tr>
                             <th class="ps-4">No. Transaksi</th>
                             <th>Waktu</th>
-                            <th class="text-end pe-4">Total Akhir</th>
+                            <th class="text-end pe-4">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -209,114 +208,10 @@
 </div>
 
 <script>
-    let keranjang = [];
-
-    // Live Clock Function
-    function updateClock() {
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        document.getElementById('live-clock').innerHTML = `<i class="bi bi-calendar3 me-2"></i>${now.toLocaleDateString('id-ID', options)}`;
-    }
-    setInterval(updateClock, 1000); updateClock();
-
-    function tambahItem() {
-        const sel = document.getElementById('select-barang');
-        const s = sel.options[sel.selectedIndex];
-        if (!s.value) return;
-
-        const item = {
-            id: s.value,
-            barcode: s.getAttribute('data-barcode'),
-            nama: s.getAttribute('data-nama'),
-            harga: parseInt(s.getAttribute('data-harga')),
-            stok: parseInt(s.getAttribute('data-stok')),
-            qty: parseInt(document.getElementById('input-qty').value)
-        };
-
-        // Cek Stok
-        const exists = keranjang.find(i => i.id === item.id);
-        const currentQtyInCart = exists ? exists.qty : 0;
-        
-        if (item.qty + currentQtyInCart > item.stok) {
-            return alert("⚠️ Stok tidak mencukupi!\nSisa stok di gudang: " + item.stok);
-        }
-
-        if (exists) {
-            exists.qty += item.qty;
-            exists.subtotal = exists.qty * exists.harga;
-        } else {
-            item.subtotal = item.qty * item.harga;
-            keranjang.push(item);
-        }
-        
-        render();
-        // Reset qty & refocus
-        document.getElementById('input-qty').value = 1;
-        sel.selectedIndex = 0;
-    }
-
-    function render() {
-        const tbody = document.querySelector('#tabel-keranjang tbody');
-        const emptyState = document.getElementById('empty-state');
-        tbody.innerHTML = '';
-        
-        if(keranjang.length === 0) {
-            emptyState.classList.remove('d-none');
-        } else {
-            emptyState.classList.add('d-none');
-        }
-
-        let total = 0;
-        keranjang.forEach((item, index) => {
-            total += item.subtotal;
-            tbody.innerHTML += `
-                <tr class="animate__animated animate__fadeIn">
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-danger border-0" onclick="hapus(${index})">
-                            <i class="bi bi-x-circle-fill"></i>
-                        </button>
-                    </td>
-                    <td class="text-start">
-                        <div class="fw-bold">${item.nama}</div>
-                        <div class="text-muted small">${item.barcode}</div>
-                    </td>
-                    <td class="text-center">Rp ${item.harga.toLocaleString()}</td>
-                    <td class="text-center">
-                        <span class="badge bg-light text-dark border px-3 py-2">${item.qty}</span>
-                    </td>
-                    <td class="text-end pe-4 fw-bold text-dark">Rp ${item.subtotal.toLocaleString()}</td>
-                </tr>`;
-        });
-        document.getElementById('grand-total').innerText = total.toLocaleString('id-ID');
-    }
-
-    function hapus(i) { 
-        keranjang.splice(i, 1); 
-        render(); 
-    }
-
-    function prosesBayar() {
-        if (keranjang.length === 0) return alert("Keranjang masih kosong!");
-        
-        if(confirm("Konfirmasi Pembayaran?\nTotal: Rp " + document.getElementById('grand-total').innerText)) {
-            fetch('/kasir/proses_final', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ items: keranjang })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    alert("✅ Transaksi Berhasil!");
-                    location.reload(); 
-                } else {
-                    alert("❌ Gagal: " + data.error);
-                }
-            });
-        }
-    }
+    setInterval(() => {
+        document.getElementById('jam').innerHTML = new Date().toLocaleString('id-ID');
+    }, 1000);
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
