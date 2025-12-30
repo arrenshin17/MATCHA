@@ -142,7 +142,7 @@ def kasir():
 @app.route('/kasir/tambah', methods=['POST'])
 def kasir_tambah():
     id_barang = request.form.get('id_barang')
-    qty = int(request.form.get('qty', 1))
+    qty = int(request.form.get('qty', 1 ))
 
     cur = mysql.connection.cursor()
     cur.execute("SELECT id_gudang, barcode, nama_barang, harga_jual, stok FROM gudang WHERE id_gudang=%s", (id_barang,))
