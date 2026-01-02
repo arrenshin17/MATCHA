@@ -425,4 +425,4 @@ if __name__ == '__main__':
     # host='0.0.0.0' = bisa diakses dari perangkat lain di jaringan yang sama (kek sama wifi gitu)
     # port=11111 = aplikasi berjalan di port 11111
     # debug=True = mode development (auto-reload jika ada perubahan code)
-    app.run(host='0.0.0.0', port=11111, debug=True)
+    app.run(port=17126, debug=True)
